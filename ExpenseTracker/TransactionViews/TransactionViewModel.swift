@@ -7,6 +7,9 @@
 
 import Foundation
 import Combine
+import Collections
+
+typealias transactionGroup = OrderedDictionary<String, [Transaction]>
 
 final class TransactionViewModel: ObservableObject {
     @Published var transactions: [Transaction] = []
@@ -46,5 +49,15 @@ final class TransactionViewModel: ObservableObject {
                 self?.transactions = result
             }
             .store(in: &cancellables)
+    }
+
+    func groupTransactionByMonth() -> transactionGroup {
+        guard !(transactions.isEmpty) else {
+            return [:]
+        }
+
+        let groupedTransactions = transactionGroup(grouping: transactions) { $0.month }
+
+        return groupedTransactions
     }
 }

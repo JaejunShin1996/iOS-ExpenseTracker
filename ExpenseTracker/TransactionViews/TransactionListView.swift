@@ -19,7 +19,7 @@ struct TransactionListView: View {
                 Spacer()
 
                 NavigationLink {
-                    //
+                    TransactionsByMonthView()
                 } label: {
                     HStack {
                         Text("See All")
