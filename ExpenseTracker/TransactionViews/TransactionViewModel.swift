@@ -9,7 +9,8 @@ import Foundation
 import Combine
 import Collections
 
-typealias transactionGroup = OrderedDictionary<String, [Transaction]>
+typealias TransactionGroup = OrderedDictionary<String, [Transaction]>
+typealias TransactionPrefixSum = [(String, Double)]
 
 final class TransactionViewModel: ObservableObject {
     @Published var transactions: [Transaction] = []
@@ -51,13 +52,35 @@ final class TransactionViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func groupTransactionByMonth() -> transactionGroup {
+    func groupTransactionByMonth() -> TransactionGroup {
         guard !(transactions.isEmpty) else {
             return [:]
         }
 
-        let groupedTransactions = transactionGroup(grouping: transactions) { $0.month }
+        let groupedTransactions = TransactionGroup(grouping: transactions) { $0.month }
 
         return groupedTransactions
+    }
+
+    func accumulateTransactions() -> TransactionPrefixSum {
+        guard !(transactions.isEmpty) else { return [] }
+
+        // the data is not updated so using fixed date.
+        let today = "02/17/2022".dateParsed()
+        let dateInterval = Calendar.current.dateInterval(of: .month, for: today)!
+
+        var sum: Double = .zero
+        var cumulativeSum = TransactionPrefixSum()
+
+        for date in stride(from: dateInterval.start, to: today, by: 60 * 60 * 24) {
+            let dailyExpenses = transactions.filter { $0.dateParsed == date && $0.isExpense }
+            let dailyTotal = dailyExpenses.reduce(0) { $0 - $1.signedAmount }
+
+            sum += dailyTotal
+            sum = sum.roundedDouble()
+            cumulativeSum.append((date.formatted(.dateTime.year().month().day()), sum))
+        }
+
+        return cumulativeSum
     }
 }
