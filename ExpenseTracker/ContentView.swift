@@ -16,10 +16,6 @@ struct ContentView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    Text("OverView")
-                        .font(.title2)
-                        .bold()
-
                     let data = transactionViewModel.accumulateTransactions()
 
                     if !(data.isEmpty) {
@@ -27,7 +23,7 @@ struct ContentView: View {
 
                         CardView {
                             VStack(alignment: .leading) {
-                                ChartLabel(totalExpenses.formatted(.currency(code: "USD")), type: .title, format: "$%.02f")
+                                ChartLabel(totalExpenses.formatted(.currency(code: "USD")), type: .title, format: "US$%.02f")
                                 LineChart()
                             }
                             .background(Color.systemBackground)
@@ -49,7 +45,7 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .background(Color.background)
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Overview")
             .toolbar {
                 ToolbarItem {
                     Image(systemName: "bell.badge")
